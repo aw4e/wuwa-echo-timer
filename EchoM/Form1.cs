@@ -151,13 +151,15 @@ namespace EchoM
         {
             if (infoBox.InvokeRequired)
             {
-                infoBox.Invoke(new Action(() => { 
+                infoBox.Invoke(new Action(() => {
+                    infoBox.Text = "";
                     infoBox.AppendText(text);
                     infoBox.ScrollToCaret();
                 }));
             }
             else
             {
+                infoBox.Text = "";
                 infoBox.AppendText(text);
                 infoBox.ScrollToCaret();
             }
