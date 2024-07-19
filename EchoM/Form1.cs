@@ -75,7 +75,7 @@ namespace EchoM
 
             return messages.TryGetValue(value, out var availableTimes)
                 ? $"Starting Auto-Clicking with Minutes {value}\nAvailable times: '{availableTimes}'\nTime Zone: {TimeZoneInfo.Local.DisplayName}\n"
-                : "Value Tidak Tersedia.\n";
+                : "Value Not Available.\n";
         }
 
         private void stopButton_Click(object sender, EventArgs e)
