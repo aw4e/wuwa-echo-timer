@@ -75,7 +75,7 @@ namespace EchoM
 
             return messages.TryGetValue(value, out var availableTimes)
                 ? $"Starting Auto-Clicking with Minutes {value}\nAvailable times: '{availableTimes}'\nTime Zone: {TimeZoneInfo.Local.DisplayName}\n"
-                : "Value Not Available.\n";
+                : "Value Tidak Tersedia.\n";
         }
 
         private void stopButton_Click(object sender, EventArgs e)
@@ -121,11 +121,11 @@ namespace EchoM
         private void TimerCallback(object state)
         {
             DateTime now = DateTime.Now;
-            int lastTwoDigitsOfMilliseconds = (now.Millisecond / 10) % 100;
+            int Milisecond = now.Millisecond / 10;
 
             if (now.Minute % 10 == intValue &&
                 now.Second % 10 == intValue &&
-                lastTwoDigitsOfMilliseconds % 10 == intValue)
+                Milisecond % 10 == intValue)
             {
                 PerformClick();
             }
