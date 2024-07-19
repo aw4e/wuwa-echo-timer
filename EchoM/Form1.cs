@@ -22,22 +22,32 @@ namespace EchoM
         public Form1()
         {
             InitializeComponent();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
             InitializeComboBoxes();
         }
 
         private void InitializeComboBoxes()
         {
-            substatDropdown.Items.Add(new ComboBoxItem("Crit Dmg", 1));
-            substatDropdown.Items.Add(new ComboBoxItem("Crit Rate", 2));
-
-            for (int i = 0; i <= 9; i++)
+            // I don't know what this code is for but I put it in case it comes in handy.
+            substatDropdown.Items.AddRange(new[]
             {
-                timeDropdown.Items.Add(new ComboBoxItem($"X{i}", i));
-            }
+                new ComboBoxItem("ATK", 0),
+                new ComboBoxItem("HP", 1),
+                new ComboBoxItem("DEF", 2),
+                new ComboBoxItem("ATK%", 3),
+                new ComboBoxItem("HP%", 4),
+                new ComboBoxItem("DEF%", 5),
+                new ComboBoxItem("Energy Regen", 6),
+                new ComboBoxItem("Crit Rate", 7),
+                new ComboBoxItem("Crit DMG", 8),
+                new ComboBoxItem("Basic Atk DMG", 9),
+                new ComboBoxItem("Heavy Atk DMG", 10),
+                new ComboBoxItem("Res Skill DMG", 11),
+                new ComboBoxItem("Res Lib DMG", 12)
+            });
+
+            timeDropdown.Items.AddRange(Enumerable.Range(0, 10)
+                .Select(i => new ComboBoxItem($"X{i}", i))
+                .ToArray());
         }
 
         private void startButton_Click(object sender, EventArgs e)
@@ -141,11 +151,15 @@ namespace EchoM
         {
             if (infoBox.InvokeRequired)
             {
-                infoBox.Invoke(new Action(() => infoBox.AppendText(text)));
+                infoBox.Invoke(new Action(() => { 
+                    infoBox.AppendText(text);
+                    infoBox.ScrollToCaret();
+                }));
             }
             else
             {
                 infoBox.AppendText(text);
+                infoBox.ScrollToCaret();
             }
         }
 
