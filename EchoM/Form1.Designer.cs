@@ -79,9 +79,9 @@
             // 
             // startButton
             // 
-            startButton.Location = new Point(12, 84);
+            startButton.Location = new Point(12, 68);
             startButton.Name = "startButton";
-            startButton.Size = new Size(117, 23);
+            startButton.Size = new Size(117, 39);
             startButton.TabIndex = 4;
             startButton.Text = "Start";
             startButton.UseVisualStyleBackColor = true;
@@ -89,9 +89,9 @@
             // 
             // stopButton
             // 
-            stopButton.Location = new Point(135, 84);
+            stopButton.Location = new Point(135, 68);
             stopButton.Name = "stopButton";
-            stopButton.Size = new Size(121, 23);
+            stopButton.Size = new Size(121, 39);
             stopButton.TabIndex = 5;
             stopButton.Text = "Stop";
             stopButton.UseVisualStyleBackColor = true;
@@ -134,7 +134,6 @@
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "Form1";
             Text = "EchoM";
-            Load += Form1_Load;
             groupBox1.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
