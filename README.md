@@ -3,4 +3,4 @@ Based on <a href="https://docs.google.com/spreadsheets/d/1Wixi5VK2EGO1oqbiFDkhRP
 
 Feel Free to Edit and Remake 💙
 
--# Noted U Need DOTNET 8.0
+-# Noted U Need .NET 8.0
