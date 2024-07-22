@@ -37,12 +37,12 @@
             stopButton = new Button();
             groupBox1 = new GroupBox();
             infoBox = new RichTextBox();
-            alwaysOnTopLabel = new Button();
             secondsDropdown = new ComboBox();
             secondsLabel = new Label();
             curTimeLabel = new Label();
             curTime = new Label();
             curTimeTimer = new System.Windows.Forms.Timer(components);
+            alwaysOnTopCheckBox = new CheckBox();
             SuspendLayout();
             // 
             // substatLabel
@@ -85,7 +85,7 @@
             // 
             // startButton
             // 
-            startButton.Location = new Point(239, 9);
+            startButton.Location = new Point(239, 39);
             startButton.Name = "startButton";
             startButton.Size = new Size(70, 37);
             startButton.TabIndex = 4;
@@ -95,7 +95,7 @@
             // 
             // stopButton
             // 
-            stopButton.Location = new Point(315, 9);
+            stopButton.Location = new Point(315, 39);
             stopButton.Name = "stopButton";
             stopButton.Size = new Size(74, 37);
             stopButton.TabIndex = 5;
@@ -123,16 +123,6 @@
             infoBox.Size = new Size(365, 146);
             infoBox.TabIndex = 0;
             infoBox.Text = "";
-            // 
-            // alwaysOnTopLabel
-            // 
-            alwaysOnTopLabel.Location = new Point(239, 52);
-            alwaysOnTopLabel.Name = "alwaysOnTopLabel";
-            alwaysOnTopLabel.Size = new Size(150, 37);
-            alwaysOnTopLabel.TabIndex = 7;
-            alwaysOnTopLabel.Text = "Always On Top";
-            alwaysOnTopLabel.UseVisualStyleBackColor = true;
-            alwaysOnTopLabel.Click += alwaysOnTopLabel_Click;
             // 
             // secondsDropdown
             // 
@@ -176,16 +166,27 @@
             curTimeTimer.Interval = 1;
             curTimeTimer.Tick += curTimeTimer_Tick;
             // 
+            // alwaysOnTopCheckBox
+            // 
+            alwaysOnTopCheckBox.AutoSize = true;
+            alwaysOnTopCheckBox.Location = new Point(239, 10);
+            alwaysOnTopCheckBox.Name = "alwaysOnTopCheckBox";
+            alwaysOnTopCheckBox.Size = new Size(117, 20);
+            alwaysOnTopCheckBox.TabIndex = 12;
+            alwaysOnTopCheckBox.Text = "Always On Top";
+            alwaysOnTopCheckBox.UseVisualStyleBackColor = true;
+            alwaysOnTopCheckBox.CheckedChanged += alwaysOnTopCheckBox_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(401, 303);
+            Controls.Add(alwaysOnTopCheckBox);
             Controls.Add(curTime);
             Controls.Add(curTimeLabel);
             Controls.Add(secondsDropdown);
             Controls.Add(secondsLabel);
-            Controls.Add(alwaysOnTopLabel);
             Controls.Add(infoBox);
             Controls.Add(groupBox1);
             Controls.Add(stopButton);
@@ -211,11 +212,11 @@
         private Button stopButton;
         private GroupBox groupBox1;
         private RichTextBox infoBox;
-        private Button alwaysOnTopLabel;
         private ComboBox secondsDropdown;
         private Label secondsLabel;
         private Label curTimeLabel;
         private Label curTime;
         private System.Windows.Forms.Timer curTimeTimer;
+        private CheckBox alwaysOnTopCheckBox;
     }
 }

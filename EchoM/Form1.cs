@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace EchoM
 {
@@ -86,7 +81,7 @@ namespace EchoM
             UpdateRichBox("Stopping Auto-Clicking\n");
         }
 
-        private void alwaysOnTopLabel_Click(object sender, EventArgs e)
+        private void alwaysOnTopCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             this.TopMost = !this.TopMost;
         }
