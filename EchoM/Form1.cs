@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -10,8 +12,11 @@ namespace EchoM
     {
         private ComboBoxItem selectedSubstatItem;
         private ComboBoxItem selectedTimeItem;
+        private ComboBoxItem selectedSecondItem;
         private System.Threading.Timer autoClickTimer;
+        private DateTime lastClickTime = DateTime.MinValue;
         private int intValue;
+        private int intValue2;
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern void mouse_event(uint dwFlags, int dx, int dy, uint dwData, int dwExtraInfo);
@@ -23,69 +28,55 @@ namespace EchoM
         {
             InitializeComponent();
             InitializeComboBoxes();
+            curTimeTimer.Start();
         }
 
         private void InitializeComboBoxes()
         {
-            // I don't know what this code is for but I put it in case it comes in handy.
-            substatDropdown.Items.AddRange(new[]
+            // For you guys if wanna add calculation of accuracy
+            InitializeDropdown(substatDropdown, new[]
             {
-                new ComboBoxItem("ATK", 0),
-                new ComboBoxItem("HP", 1),
-                new ComboBoxItem("DEF", 2),
-                new ComboBoxItem("ATK%", 3),
-                new ComboBoxItem("HP%", 4),
-                new ComboBoxItem("DEF%", 5),
-                new ComboBoxItem("Energy Regen", 6),
-                new ComboBoxItem("Crit Rate", 7),
-                new ComboBoxItem("Crit DMG", 8),
-                new ComboBoxItem("Basic Atk DMG", 9),
-                new ComboBoxItem("Heavy Atk DMG", 10),
-                new ComboBoxItem("Res Skill DMG", 11),
-                new ComboBoxItem("Res Lib DMG", 12)
-            });
+                "ATK", "HP", "DEF", "ATK%", "HP%", "DEF%",
+                "Energy Regen", "Crit Rate", "Crit DMG",
+                "Basic Atk DMG", "Heavy Atk DMG",
+                "Res Skill DMG", "Res Lib DMG"
+            }, Enumerable.Range(0, 13).ToArray());
 
-            timeDropdown.Items.AddRange(Enumerable.Range(0, 10)
-                .Select(i => new ComboBoxItem($"X{i}", i))
-                .ToArray());
+            InitializeTimeDropdown(timeDropdown);
+            InitializeTimeDropdown(secondsDropdown);
+
+            SetDefaultSelection();
+        }
+
+        private void InitializeDropdown(ComboBox comboBox, string[] names, int[] values)
+        {
+            comboBox.Items.AddRange(names.Zip(values, (name, value) => new ComboBoxItem(name, value)).ToArray());
+        }
+
+        private void InitializeTimeDropdown(ComboBox comboBox)
+        {
+            comboBox.Items.AddRange(
+                Enumerable.Range(0, 10)
+                          .Select(i => new ComboBoxItem($"X{i}", i))
+                          .Concat(new[] { new ComboBoxItem("0X", 10) })
+                          .ToArray());
         }
 
         private void startButton_Click(object sender, EventArgs e)
         {
-            if (selectedSubstatItem == null || selectedTimeItem == null)
+            if (selectedSubstatItem == null || selectedTimeItem == null || selectedSecondItem == null)
             {
-                UpdateRichBox("Please select Substat and Time first.\n");
+                UpdateRichBox("Please select Substat, Time, and Seconds first.\n");
                 return;
             }
 
-            if (selectedTimeItem.Value is int value)
+            if (selectedTimeItem.Value is int value && selectedSecondItem.Value is int value2)
             {
                 intValue = value;
-                string text = GetStartMessage(intValue);
-                UpdateRichBox(text);
+                intValue2 = value2;
+                UpdateRichBox(GetStartMessage(intValue, intValue2));
                 StartAutoClickTimer();
             }
-        }
-
-        private string GetStartMessage(int value)
-        {
-            var messages = new Dictionary<int, string>
-            {
-                { 0, "00, '10', '20', '30', '40', '50'" },
-                { 1, "01, '11', '21', '31', '41', '51'" },
-                { 2, "02, '12', '22', '32', '42', '52'" },
-                { 3, "03, '13', '23', '33', '43', '53'" },
-                { 4, "04, '14', '24', '34', '44', '54'" },
-                { 5, "05, '15', '25', '35', '45', '55'" },
-                { 6, "06, '16', '26', '36', '46', '56'" },
-                { 7, "07, '17', '27', '37', '47', '57'" },
-                { 8, "08, '18', '28', '38', '48', '58'" },
-                { 9, "09, '19', '29', '39', '49', '59'" }
-            };
-
-            return messages.TryGetValue(value, out var availableTimes)
-                ? $"Starting Auto-Clicking with Minutes {value}\nAvailable times: '{availableTimes}'\nTime Zone: {TimeZoneInfo.Local.DisplayName}\n"
-                : "Value Tidak Tersedia.\n";
         }
 
         private void stopButton_Click(object sender, EventArgs e)
@@ -95,29 +86,94 @@ namespace EchoM
             UpdateRichBox("Stopping Auto-Clicking\n");
         }
 
+        private void alwaysOnTopLabel_Click(object sender, EventArgs e)
+        {
+            this.TopMost = !this.TopMost;
+        }
+
+        private void curTimeTimer_Tick(object sender, EventArgs e)
+        {
+            curTime.Text = DateTime.Now.ToString("HH:mm:ss:ff");
+        }
+
+        private void SetDefaultSelection()
+        {
+            secondsDropdown.SelectedItem = secondsDropdown.Items
+                .Cast<ComboBoxItem>()
+                .FirstOrDefault(item => item.Name == "0X");
+        }
+
+        private string GetStartMessage(int value, int value2)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Starting Auto-Clicking with Minutes {(value == 10 ? "0" : value.ToString())}");
+
+            if (value == 10 && value2 == 10)
+            {
+                sb.AppendLine("Available times: '0X', X = 1-9");
+                sb.AppendLine("With Seconds: '0X', X = 1-9");
+            }
+            else if (value == 10)
+            {
+                sb.AppendLine("Available times: '0X', X = 1-9");
+                sb.AppendLine($"With Seconds: '1-9X, X = {value2}'");
+            }
+            else if (value2 == 10)
+            {
+                sb.AppendLine($"Available times: '1-9X, X = {value}'");
+                sb.AppendLine("With Seconds: '0X', X = 1-9");
+            }
+            else
+            {
+                sb.AppendLine($"Available times: '1-9X, X = {value}'");
+                sb.AppendLine($"With Seconds: '1-9X, X = {value2}'");
+            }
+
+            sb.AppendLine($"Time Zone: {TimeZoneInfo.Local.DisplayName}");
+            return sb.ToString();
+        }
+
         private void substatDropdown_SelectedValueChanged(object sender, EventArgs e)
         {
-            if (substatDropdown.SelectedItem != null)
+            if (substatDropdown.SelectedItem is ComboBoxItem selectedItem)
             {
-                selectedSubstatItem = (ComboBoxItem)substatDropdown.SelectedItem;
+                selectedSubstatItem = selectedItem;
                 CheckAndUpdateRichBox();
             }
         }
 
         private void timeDropdown_SelectedValueChanged(object sender, EventArgs e)
         {
-            if (timeDropdown.SelectedItem != null)
+            if (timeDropdown.SelectedItem is ComboBoxItem selectedItem)
             {
-                selectedTimeItem = (ComboBoxItem)timeDropdown.SelectedItem;
+                selectedTimeItem = selectedItem;
                 CheckAndUpdateRichBox();
             }
         }
 
+        private void secondsDropdown_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (secondsDropdown.SelectedItem is ComboBoxItem selectedItem)
+            {
+                selectedSecondItem = selectedItem;
+            }
+            else
+            {
+                selectedSecondItem = secondsDropdown.Items
+                    .Cast<ComboBoxItem>()
+                    .FirstOrDefault(item => item.Name == "0X");
+            }
+            CheckAndUpdateRichBox();
+        }
+
         private void CheckAndUpdateRichBox()
         {
-            if (selectedSubstatItem != null && selectedTimeItem != null)
+            if (selectedSubstatItem != null && selectedTimeItem != null && selectedSecondItem != null)
             {
-                string text = $"Substat: {selectedSubstatItem.Name}\nTime: {selectedTimeItem.Name}\n";
+                string text = $"Substat: {selectedSubstatItem.Name}\n" +
+                              $"Time: {selectedTimeItem.Name}\n" +
+                              $"Seconds: {selectedSecondItem.Name}\n";
+
                 UpdateRichBox(text);
             }
         }
@@ -131,13 +187,20 @@ namespace EchoM
         private void TimerCallback(object state)
         {
             DateTime now = DateTime.Now;
-            int Milisecond = now.Millisecond / 10;
+            int milisecond = now.Millisecond / 10;
 
-            if (now.Minute % 10 == intValue &&
-                now.Second % 10 == intValue &&
-                Milisecond % 10 == intValue)
+            int checkMinute = intValue == 10 ? now.Minute / 10 : now.Minute % 10;
+            int checkSecond = intValue2 == 10 ? now.Second / 10 : now.Second % 10;
+            int checkMilisecond = intValue == 10 ? milisecond / 10 : milisecond % 10;
+
+            bool shouldClick = checkMinute == (intValue == 10 ? 0 : intValue) &&
+                               checkSecond == (intValue2 == 10 ? 0 : intValue2) &&
+                               checkMilisecond == (intValue == 10 ? 0 : intValue);
+
+            if (shouldClick && now.Second != lastClickTime.Second)
             {
                 PerformClick();
+                lastClickTime = now;
             }
         }
 
@@ -145,22 +208,41 @@ namespace EchoM
         {
             mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+            string timeOfClick = DateTime.Now.ToString("HH:mm:ss:ff");
+            AppendTextOnce($"Clicked at {timeOfClick}\n");
         }
 
-        private void UpdateRichBox(string text)
+        private void AppendTextOnce(string text)
         {
             if (infoBox.InvokeRequired)
             {
-                infoBox.Invoke(new Action(() => {
-                    infoBox.Text = "";
+                infoBox.Invoke(new Action(() =>
+                {
                     infoBox.AppendText(text);
                     infoBox.ScrollToCaret();
                 }));
             }
             else
             {
-                infoBox.Text = "";
                 infoBox.AppendText(text);
+                infoBox.ScrollToCaret();
+            }
+        }
+
+        private void UpdateRichBox(string text)
+        {
+            if (infoBox.InvokeRequired)
+            {
+                infoBox.Invoke(new Action(() =>
+                {
+                    infoBox.Text = text;
+                    infoBox.ScrollToCaret();
+                }));
+            }
+            else
+            {
+                infoBox.Text = text;
                 infoBox.ScrollToCaret();
             }
         }
